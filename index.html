@@ -523,6 +523,9 @@
             
             currentFacingMode = facingMode;
             
+            // 前置摄像头镜像 (自拍效果), 后置摄像头不镜像
+            bgCanvas.style.transform = (facingMode === 'user') ? 'scaleX(-1)' : 'scaleX(1)';
+            
             cameraFeed = new Camera(videoElement, {
                 onFrame: async () => { await hands.send({image: videoElement}); },
                 width: isMobile ? 640 : V_WIDTH,
