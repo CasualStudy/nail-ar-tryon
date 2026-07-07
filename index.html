@@ -185,6 +185,10 @@
                 <button id="clearTextureBtn" style="background: rgba(255,100,100,0.15); color: #ff6464; border: 1px solid rgba(255,100,100,0.4); padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">
                     ✕ 清除贴图
                 </button>
+                
+                <button id="switchCameraBtn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    🔄 切换摄像头
+                </button>
             </div>
         </div>
     </div>
@@ -489,14 +493,40 @@
         });
         hands.onResults(onResults);
 
-        const cameraFeed = new Camera(videoElement, {
-            onFrame: async () => { await hands.send({image: videoElement}); },
-            width: isMobile ? 640 : V_WIDTH, // 移动端降低分辨率
-            height: isMobile ? 480 : V_HEIGHT,
-            facingMode: 'user' // 强制前置摄像头
+        // 当前使用的摄像头 (前置/后置)
+        let currentFacingMode = 'user'; // 'user' = 前置, 'environment' = 后置
+        let cameraFeed = null;
+
+        function startCamera(facingMode) {
+            // 停止旧摄像头
+            if (cameraFeed) {
+                try { cameraFeed.stop(); } catch(e) {}
+            }
+            
+            currentFacingMode = facingMode;
+            
+            cameraFeed = new Camera(videoElement, {
+                onFrame: async () => { await hands.send({image: videoElement}); },
+                width: isMobile ? 640 : V_WIDTH,
+                height: isMobile ? 480 : V_HEIGHT,
+                facingMode: facingMode
+            });
+            
+            cameraFeed.start().catch(err => {
+                console.error('摄像头启动失败:', err);
+                document.getElementById('dbStatus').innerHTML = '摄像头启动失败: ' + err.message;
+            });
+        }
+
+        // 切换摄像头按钮
+        document.getElementById('switchCameraBtn').addEventListener('click', () => {
+            const newMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            console.log('切换摄像头:', currentFacingMode, '→', newMode);
+            startCamera(newMode);
         });
 
-        setTimeout(() => { cameraFeed.start().catch(err => console.error('摄像头启动失败:', err)); }, 500);
+        // 首次启动 (前置摄像头)
+        setTimeout(() => { startCamera('user'); }, 500);
 
     </script>
 </body>
