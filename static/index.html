@@ -135,9 +135,12 @@
         <video class="input_video" autoplay playsinline muted></video>
         <canvas class="bg_canvas" width="1280" height="720"></canvas>
         <div id="loadingIndicator" class="loading">正在加载手部检测模型...</div>
+        
+        <!-- 隐藏/显示控制面板按钮 -->
+        <button id="togglePanelBtn" style="position:absolute; bottom:30px; right:20px; z-index:11; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); backdrop-filter:blur(10px); border:1px solid var(--glass-border); color:white; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center;">⚙</button>
     </div>
 
-    <div class="floating-panel">
+    <div class="floating-panel" id="floatingPanel">
         <div>
             <h3 class="section-title">形态微调</h3>
             <div class="sliders-grid">
@@ -215,6 +218,21 @@
         let currentColor = '#E2A7AD';
         let currentNailTextureImg = null;
         
+        // === 隐藏/显示控制面板 ===
+        let panelHidden = false;
+        document.getElementById('togglePanelBtn').addEventListener('click', () => {
+            panelHidden = !panelHidden;
+            const panel = document.getElementById('floatingPanel');
+            const btn = document.getElementById('togglePanelBtn');
+            if (panelHidden) {
+                panel.style.display = 'none';
+                btn.textContent = '👁';
+            } else {
+                panel.style.display = 'flex';
+                btn.textContent = '⚙';
+            }
+        });
+
         // === 滑块监听 ===
         document.getElementById('lengthSlider').addEventListener('input', e => customLength = parseFloat(e.target.value));
         document.getElementById('widthSlider').addEventListener('input', e => customWidth = parseFloat(e.target.value));
