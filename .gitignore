@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+
+# Model weights
+*.task
+*.pt
+*.pth
+*.onnx
+*.bin
+
+# Images (test files)
+test_*.jpg
+test_*.png
+debug_*.png
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
