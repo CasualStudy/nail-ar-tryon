@@ -132,7 +132,7 @@
     </div>
 
     <div class="camera-container" id="container">
-        <video class="input_video" autoplay playsinline></video>
+        <video class="input_video" autoplay playsinline muted></video>
         <canvas class="bg_canvas" width="1280" height="720"></canvas>
         <div id="loadingIndicator" class="loading">正在加载手部检测模型...</div>
     </div>
@@ -290,6 +290,18 @@
         const bgCanvas = document.querySelector('.bg_canvas');
         const bgCtx = bgCanvas.getContext('2d');
         const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // === 动态适配视频比例 (解决 iPhone 竖屏画面变扁的问题) ===
+        // canvas 固定 1280x720 会导致 9:16 视频被拉伸, 这里监听 video 实际尺寸动态调整
+        let videoRealW = 1280, videoRealH = 720;
+        videoElement.addEventListener('loadedmetadata', () => {
+            videoRealW = videoElement.videoWidth || 1280;
+            videoRealH = videoElement.videoHeight || 720;
+            // 保持 canvas 的 width/height 属性与视频比例一致, 避免 drawImage 拉伸
+            bgCanvas.width = videoRealW;
+            bgCanvas.height = videoRealH;
+            console.log('视频尺寸:', videoRealW, 'x', videoRealH);
+        });
 
         // === 3. 生成静态 ISO 噪点贴图 ===
         const noiseCanvas = document.createElement('canvas');
@@ -465,21 +477,26 @@
             }
         }
 
+        // 检测移动端
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
         hands.setOptions({
-            maxNumHands: 2,
-            modelComplexity: 1, 
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.7
+            maxNumHands: 1, // 移动端只检测一只手, 提升性能
+            modelComplexity: isMobile ? 0 : 1, // 移动端用轻量模型
+            minDetectionConfidence: 0.6,
+            minTrackingConfidence: 0.5
         });
         hands.onResults(onResults);
 
         const cameraFeed = new Camera(videoElement, {
             onFrame: async () => { await hands.send({image: videoElement}); },
-            width: V_WIDTH, height: V_HEIGHT
+            width: isMobile ? 640 : V_WIDTH, // 移动端降低分辨率
+            height: isMobile ? 480 : V_HEIGHT,
+            facingMode: 'user' // 强制前置摄像头
         });
 
-        setTimeout(() => { cameraFeed.start().catch(err => console.error(err)); }, 500);
+        setTimeout(() => { cameraFeed.start().catch(err => console.error('摄像头启动失败:', err)); }, 500);
 
     </script>
 </body>
