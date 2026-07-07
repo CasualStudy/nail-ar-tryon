@@ -126,18 +126,18 @@
 </head>
 <body>
 
-    <div class="top-bar">
-        <h1 class="app-title">Nail Studio Pro</h1>
-        <div id="dbStatus">AR 美甲引擎在线</div>
+    <div style="position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:100; display:flex; align-items:center; gap:12px;">
+        <div class="top-bar" style="position:static; transform:none;">
+            <h1 class="app-title">Nail Studio Pro</h1>
+            <div id="dbStatus">AR 美甲引擎在线</div>
+        </div>
+        <button id="togglePanelBtn" style="width:44px; height:44px; border-radius:50%; background:var(--glass-bg); backdrop-filter:blur(10px); border:1px solid var(--glass-border); color:white; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">⚙</button>
     </div>
 
     <div class="camera-container" id="container">
         <video class="input_video" autoplay playsinline muted></video>
         <canvas class="bg_canvas" width="1280" height="720"></canvas>
         <div id="loadingIndicator" class="loading">正在加载手部检测模型...</div>
-        
-        <!-- 隐藏/显示控制面板按钮 -->
-        <button id="togglePanelBtn" style="position:fixed; top:20px; right:20px; z-index:100; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); backdrop-filter:blur(10px); border:1px solid var(--glass-border); color:white; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center;">⚙</button>
     </div>
 
     <div class="floating-panel" id="floatingPanel">
